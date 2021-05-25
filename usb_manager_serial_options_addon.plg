@@ -22,9 +22,10 @@
 <CHANGES>
 ##&name;
 ###&version;
-01.06.2020
 
 - initial release.
+
+Thanks to ich777 for the repo.
 </CHANGES>
 
 <!--
@@ -34,6 +35,15 @@ The 'pre-install' script.
 <INLINE>
 # Remove emhttp files so we can re-install.
 rm -rf /usr/local/emhttp/plugins/&name;/* 2>/dev/null
+</INLINE>
+</FILE>
+
+<FILE Name="&plugdir;/README.md">
+<INLINE>
+**USB Serial Options**
+
+Install USB modules options and usb_wwan to support GSM USB modems.
+
 </INLINE>
 </FILE>
 
