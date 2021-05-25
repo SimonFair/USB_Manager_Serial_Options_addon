@@ -3,10 +3,10 @@
 <!DOCTYPE PLUGIN [
 <!ENTITY name      "Usb_manager_serial_options_addon">
 <!ENTITY author    "SimonFair">
-<!ENTITY version   "2021.06.01">
+<!ENTITY version   "2021.05.25">
 <!ENTITY gitURL    "https://raw.githubusercontent.com/SimonFair/USB_Manager_Serial_Options_addon/main/package">
 <!ENTITY pluginURL "https://raw.githubusercontent.com/SimonFair/USB_Manager_Serial_Options_addon/main/usb_manager_serial_options_addon.plg">
-<!ENTITY supportURL	"https://forums.unraid.net/topic/100511-plugin-usb_managerusbip-commands-and-gui/?tab=comments#comment-927469">
+<!ENTITY supportURL	"https://forums.unraid.net/topic/100511-plugin-usb_managerusbip-commands-and-gui/">
 <!ENTITY packages	"/boot/config/plugins/&name;/package">
 <!ENTITY MD5		"d4f5bfbbd53b4cf54e7e5998d33c53a3">
 ]>
@@ -45,7 +45,7 @@ The 'post-install' script.
 # Define Functions
 
 download() {
-#Download usbip
+#Download usb_serial_options
 if wget -q -nc --show-progress --progress=bar:force:noscroll -O "&packages;/${KERNEL_V%%-*}/${PACKAGE}-1.txz" "${DL_URL}/${PACKAGE}-1.txz" ; then
   if [ "$(md5sum "&packages;/${KERNEL_V%%-*}/${PACKAGE}-1.txz" | cut -d ' ' -f1)" != "$(wget -qO- "${DL_URL}/${PACKAGE}-1.txz.md5" | cut -d ' ' -f1)" ]; then
     if [ -d &packages;/${KERNEL_V%%-*}/]; then
@@ -54,10 +54,10 @@ if wget -q -nc --show-progress --progress=bar:force:noscroll -O "&packages;/${KE
     echo "-----ERROR - ERROR - ERROR - ERROR - ERROR - ERROR - ERROR - ERROR - ERROR------"
     echo "--------------------------------CHECKSUM ERROR!---------------------------------"
   fi
-  echo "-----------------Sucessfully downloaded usbip, please wait...!-----------------"
+  echo "-----------------Sucessfully downloaded usb serial options, please wait...!-----------------"
 else
   echo "-----ERROR - ERROR - ERROR - ERROR - ERROR - ERROR - ERROR - ERROR - ERROR------"
-  echo "----------------------------Can't download usbip--------------------------------"
+  echo "----------------------------Can't download usb  serial options --------------------------------"
 fi
 }
 
@@ -70,7 +70,7 @@ if [ ! -f "&packages;/${KERNEL_V%%-*}/${PACKAGE}-1.txz" ]; then
   echo "|"
   echo "| WARNING - WARNING - WARNING - WARNING - WARNING - WARNING - WARNING - WARNING"
   echo "+=============================================================================="
-  echo "---------------------Downloading usbip, please wait...!------------------------"
+  echo "---------------------Downloading usb serial options, please wait...!------------------------"
   echo "-----------This could take some time, please don't close this window!----------"
   download
 elif [ ! -s "&packages;/${KERNEL_V%%-*}/${PACKAGE}-1.txz" ]; then
@@ -80,24 +80,24 @@ elif [ ! -s "&packages;/${KERNEL_V%%-*}/${PACKAGE}-1.txz" ]; then
   echo "-------plugin has been already built against the current Kernel version--------"
 else
   echo
-  echo "-----------------------------usbip found locally!------------------------------"
+  echo "-----------------------------usb serial options found locally!------------------------------"
 fi
 }
 
 install() {
-#Install usbip package
+#Install usb serial options package
 installpkg "&packages;/${KERNEL_V%%-*}/${PACKAGE}-1.txz"
 depmod -a > /dev/null
 }
 
-check_usbip_repo() {
-#Check if usbip is already downloaded
+check_usb_serial_options_repo() {
+#Check if usb serial options is already downloaded
 
-if [ ! -z "$(modinfo usbip_host)" ]; then
-    echo "--------------------------usbip already installed...!--------------------------"
+if [ ! -z "$(modinfo options)" ]; then
+    echo "--------------------------usb serial options already installed...!--------------------------"
 else
     check
-    echo "-----------------------Installing usbip, please wait...!-----------------------"
+    echo "-----------------------Installing usb serial options, please wait...!-----------------------"
     install 
 fi
 }
@@ -118,8 +118,8 @@ if [ ! -d "&packages;/${KERNEL_V%%-*}" ]; then
   mkdir -p "&packages;/${KERNEL_V%%-*}"
 fi
 
-# Load Package from ich777 repo for usbip modules and commands.
-check_usbip_repo
+# Load Package from ich777 repo for usb serial options modules and commands.
+check_usb_serial_options_repo
 
 
 echo 
@@ -143,14 +143,14 @@ The 'remove' script.
 #Define Variables
 
 KERNEL_V="$(uname -r)"
-PACKAGE="usbip"
+PACKAGE="usbserial"
 
 # Remove installed packages
 find "&packages;/" -type f -iname "*.txz" -delete
 
-modprobe -r usbip_host
-modprobe -r vhci_hcd
-killall usbipd
+modprobe -r usb_wwan
+modprobe -r options
+
 
 # Remove all plugin files from emhttp.
 removepkg &packages;/&name;-&version;.txz 

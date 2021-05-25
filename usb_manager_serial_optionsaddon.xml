@@ -14,8 +14,8 @@ Install Modules for GSM Modems.
 
 Modules: options and usb_wwan.
 </Description>
-<Support>https://forums.unraid.net/topic/100511-plugin-usb_managerusbip-commands-and-gui/?tab=comments#comment-927469</Support>
-<Date>2021-06-01</Date>
+<Support>https://forums.unraid.net/topic/100511-plugin-usb_managerusbip-commands-and-gui/</Support>
+<Date>2021-05-25</Date>
 <Changes>
 Initial Release
 </Changes>
