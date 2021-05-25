@@ -40,7 +40,7 @@ rm -rf /usr/local/emhttp/plugins/&name;/* 2>/dev/null
 
 <FILE Name="/usr/local/emhttp/plugins/&name;/README.md">
 <INLINE>
-**USB Serial Options**
+**USB Manager Serial Options**
 
 Install USB modules options and usb_wwan to support GSM USB modems.
 
