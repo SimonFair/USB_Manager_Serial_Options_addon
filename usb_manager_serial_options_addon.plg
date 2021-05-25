@@ -38,7 +38,7 @@ rm -rf /usr/local/emhttp/plugins/&name;/* 2>/dev/null
 </INLINE>
 </FILE>
 
-<FILE Name="&plugdir;/README.md">
+<FILE Name="/usr/local/emhttp/plugins/&name;/README.md">
 <INLINE>
 **USB Serial Options**
 
