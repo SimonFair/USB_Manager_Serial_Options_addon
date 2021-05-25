@@ -111,8 +111,8 @@ DL_URL="https://github.com/ich777/unraid-plugins-repo/releases/download/$KERNEL_
 # Install the plugin bundle.
 # Create plugin directory
 mkdir /boot/config/plugins/&name; 2>/dev/null
-mkdir /usr/local/emhttp/plugins/&name; 2>/dev/null
-mkdir -p /tmp/&name;/config 2>/dev/null
+#mkdir /usr/local/emhttp/plugins/&name; 2>/dev/null
+#mkdir -p /tmp/&name;/config 2>/dev/null
 
 if [ ! -d "&packages;/${KERNEL_V%%-*}" ]; then
   mkdir -p "&packages;/${KERNEL_V%%-*}"
