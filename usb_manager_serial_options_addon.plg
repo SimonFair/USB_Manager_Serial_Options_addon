@@ -165,6 +165,7 @@ modprobe -r options
 # Remove all plugin files from emhttp.
 removepkg "&packages;/&name;/packages/${KERNEL_V%%-*}/${PACKAGE}-1.txz"
 depmod -a > /dev/null
+rm -rf /usr/local/emhttp/plugins/&name;/* 2>/dev/null
 
 echo 
 echo "-----------------------------------------------------------"
