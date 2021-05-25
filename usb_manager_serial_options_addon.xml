@@ -3,7 +3,7 @@
 <Plugin>True</Plugin>
 <PluginURL>https://raw.githubusercontent.com/SimonFair/USB_Manager_Serial_Options_addon/main/usb_manager_serial_options_addon.plg</PluginURL>
 <PluginAuthor>SimonFair</PluginAuthor>
-<Beta>True</Beta>
+<Beta>False</Beta>
 <Category>Other: Drivers:</Category>
 <Name>USB Manager Serial Options addon</Name>
 <DonateText>If you wanna buy me a coffee.</DonateText>
