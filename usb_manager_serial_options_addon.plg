@@ -124,7 +124,7 @@ done
 
 KERNEL_V="$(uname -r)"
 PACKAGE="usbserial-plugin-${KERNEL_V}"
-DL_URL="https://github.com/SimonFair/USB_Manager_USBIP_addon/releases/download/$KERNEL_V"
+DL_URL="https://github.com/SimonFair/USB_Manager_Serial_Options_addon/releases/download/$KERNEL_V"
 
 # Install the plugin bundle.
 # Create plugin directory
