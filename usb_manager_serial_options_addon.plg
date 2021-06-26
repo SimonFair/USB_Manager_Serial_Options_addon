@@ -168,7 +168,7 @@ PACKAGE="usbserial-plugin-${KERNEL_V}"
 find "&packages;/" -type f -iname "*.txz" -delete
 
 modprobe -rf usb_wwan
-modprobe -rf options
+modprobe -rf option
 
 
 # Remove all plugin files from emhttp.
