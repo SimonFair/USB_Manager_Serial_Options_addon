@@ -19,8 +19,9 @@
 		min="6.9.2">
 
 <CHANGES>
+##&name;
+###&version;
 
-###2021.06.23
 - Changed package download repository
 - Added wait for network and timout
 
