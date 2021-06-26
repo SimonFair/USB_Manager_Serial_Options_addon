@@ -3,12 +3,11 @@
 <!DOCTYPE PLUGIN [
 <!ENTITY name      "Usb_manager_serial_options_addon">
 <!ENTITY author    "SimonFair">
-<!ENTITY version   "2021.05.25">
+<!ENTITY version   "2021.06.23">
 <!ENTITY gitURL    "https://raw.githubusercontent.com/SimonFair/USB_Manager_Serial_Options_addon/main/package">
 <!ENTITY pluginURL "https://raw.githubusercontent.com/SimonFair/USB_Manager_Serial_Options_addon/main/usb_manager_serial_options_addon.plg">
 <!ENTITY supportURL	"https://forums.unraid.net/topic/100511-plugin-usb_managerusbip-commands-and-gui/">
 <!ENTITY packages	"/boot/config/plugins/&name;/package">
-<!ENTITY MD5		"d4f5bfbbd53b4cf54e7e5998d33c53a3">
 ]>
 
 <PLUGIN name="&name;"
@@ -23,9 +22,14 @@
 ##&name;
 ###&version;
 
+- Changed package download repository
+- Added wait for network and timout
+
+### 2021.05.25
 - initial release.
 
 Thanks to ich777 for the repo.
+
 </CHANGES>
 
 <!--
@@ -52,7 +56,6 @@ The 'post-install' script.
 -->
 <FILE Run="/bin/bash">
 <INLINE>
-# Define Functions
 
 download() {
 #Download usb_serial_options
@@ -112,11 +115,17 @@ else
 fi
 }
 
+#Wait for Network and timeout after 30 seconds
+HOST="8.8.8.8"
+for i in {1..10}; do
+  ping -c1 $HOST &amp;> /dev/null &amp;&amp; break;
+done
+
 #Define Variables
 
 KERNEL_V="$(uname -r)"
-PACKAGE="usbserial"
-DL_URL="https://github.com/ich777/unraid-plugins-repo/releases/download/$KERNEL_V"
+PACKAGE="usbserial-plugin-${KERNEL_V}"
+DL_URL="https://github.com/SimonFair/USB_Manager_Serial_Options_addon/releases/download/$KERNEL_V"
 
 # Install the plugin bundle.
 # Create plugin directory
@@ -128,7 +137,7 @@ if [ ! -d "&packages;/${KERNEL_V%%-*}" ]; then
   mkdir -p "&packages;/${KERNEL_V%%-*}"
 fi
 
-# Load Package from ich777 repo for usb serial options modules and commands.
+# Load Package from ich777 for usb serial options modules and commands.
 check_usb_serial_options_repo
 
 
@@ -153,13 +162,13 @@ The 'remove' script.
 #Define Variables
 
 KERNEL_V="$(uname -r)"
-PACKAGE="usbserial"
+PACKAGE="usbserial-plugin-${KERNEL_V}"
 
 # Remove installed packages
 find "&packages;/" -type f -iname "*.txz" -delete
 
-modprobe -r usb_wwan
-modprobe -r options
+modprobe -rf usb_wwan
+modprobe -rf options
 
 
 # Remove all plugin files from emhttp.
