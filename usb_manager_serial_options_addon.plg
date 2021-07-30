@@ -6,7 +6,7 @@
 <!ENTITY version   "2021.06.23">
 <!ENTITY gitURL    "https://raw.githubusercontent.com/SimonFair/USB_Manager_Serial_Options_addon/main/package">
 <!ENTITY pluginURL "https://raw.githubusercontent.com/SimonFair/USB_Manager_Serial_Options_addon/main/usb_manager_serial_options_addon.plg">
-<!ENTITY plugin    "/boot/config/plugins/usb_manager_serial_options_addon">
+<!ENTITY plugin    "/boot/config/plugins/&name;">
 <!ENTITY supportURL	"https://forums.unraid.net/topic/100511-plugin-usb_managerusbip-commands-and-gui/">
 <!ENTITY packages	"/boot/config/plugins/&name;/package">
 ]>
