@@ -3,7 +3,7 @@
 <!DOCTYPE PLUGIN [
 <!ENTITY name      "Usb_manager_serial_options_addon">
 <!ENTITY author    "SimonFair">
-<!ENTITY version   "2021.06.23">
+<!ENTITY version   "2021.07.31">
 <!ENTITY gitURL    "https://raw.githubusercontent.com/SimonFair/USB_Manager_Serial_Options_addon/main/package">
 <!ENTITY pluginURL "https://raw.githubusercontent.com/SimonFair/USB_Manager_Serial_Options_addon/main/usb_manager_serial_options_addon.plg">
 <!ENTITY plugin    "/boot/config/plugins/&name;">
@@ -22,6 +22,10 @@
 <CHANGES>
 ##&name;
 ###&version;
+
+- Add Plugin-Update-Helper support
+
+2021.06.23
 
 - Changed package download repository
 - Added wait for network and timout
