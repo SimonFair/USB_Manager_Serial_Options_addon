@@ -61,8 +61,7 @@ The 'post-install' script.
 -->
 <FILE Run="/bin/bash">
 <INLINE>
-#Check for old packages
-rm -rf $(ls -d &plugin;/package/* | grep -v "${KERNEL_V%%-*}")
+
 
 download() {
 #Download usb_serial_options
@@ -136,6 +135,9 @@ done
 KERNEL_V="$(uname -r)"
 PACKAGE="usbserial-plugin-${KERNEL_V}"
 DL_URL="https://github.com/SimonFair/USB_Manager_Serial_Options_addon/releases/download/$KERNEL_V"
+
+#Check for old packages
+rm -rf $(ls -d &plugin;/package/* | grep -v "${KERNEL_V%%-*}")
 
 # Install the plugin bundle.
 # Create plugin directory
