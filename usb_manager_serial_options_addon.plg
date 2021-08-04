@@ -62,7 +62,7 @@ The 'post-install' script.
 <FILE Run="/bin/bash">
 <INLINE>
 #Check for old packages
-rm -rf $(ls -d &plugin;/packages/* | grep -v "${KERNEL_V%%-*}")
+rm -rf $(ls -d &plugin;/package/* | grep -v "${KERNEL_V%%-*}")
 
 download() {
 #Download usb_serial_options
