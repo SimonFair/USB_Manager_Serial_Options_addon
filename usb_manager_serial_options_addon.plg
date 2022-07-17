@@ -3,12 +3,11 @@
 <!DOCTYPE PLUGIN [
 <!ENTITY name      "Usb_manager_serial_options_addon">
 <!ENTITY author    "SimonFair">
-<!ENTITY version   "2022.04.12">
-<!ENTITY gitURL    "https://raw.githubusercontent.com/SimonFair/USB_Manager_Serial_Options_addon/main/package">
+<!ENTITY version   "2022.07.17">
 <!ENTITY pluginURL "https://raw.githubusercontent.com/SimonFair/USB_Manager_Serial_Options_addon/main/usb_manager_serial_options_addon.plg">
 <!ENTITY plugin    "/boot/config/plugins/&name;">
 <!ENTITY supportURL	"https://forums.unraid.net/topic/100511-plugin-usb_managerusbip-commands-and-gui/">
-<!ENTITY packages	"/boot/config/plugins/&name;/package">
+<!ENTITY packages	"/boot/config/plugins/&name;/packages">
 ]>
 
 <PLUGIN name="&name;"
@@ -20,6 +19,10 @@
 		min="6.9.2">
 
 <CHANGES>
+
+###2022.07.17
+- Necessary changes for unRAID 6.11+
+- Cleanup
 
 ###2022.04.12
 - Removed warning message from console on boot
@@ -38,16 +41,6 @@ Thanks to ich777 for the repo.
 
 </CHANGES>
 
-<!--
-The 'pre-install' script.
--->
-<FILE Run="/bin/bash">
-<INLINE>
-# Remove emhttp files so we can re-install.
-rm -rf /usr/local/emhttp/plugins/&name;/* 2>/dev/null
-</INLINE>
-</FILE>
-
 <FILE Name="/usr/local/emhttp/plugins/&name;/README.md">
 <INLINE>
 **USB Manager Serial Options**
@@ -63,7 +56,6 @@ The 'post-install' script.
 <FILE Run="/bin/bash">
 <INLINE>
 
-
 download() {
 #Download usb_serial_options
 if wget -q -nc --show-progress --progress=bar:force:noscroll -O "&packages;/${KERNEL_V%%-*}/${PACKAGE}-1.txz" "${DL_URL}/${PACKAGE}-1.txz" ; then
@@ -71,19 +63,22 @@ if wget -q -nc --show-progress --progress=bar:force:noscroll -O "&packages;/${KE
     if [ -d &packages;/${KERNEL_V%%-*}/]; then
       rm -rf &packages;/${KERNEL_V%%-*}/;
     fi
-    echo "-----ERROR - ERROR - ERROR - ERROR - ERROR - ERROR - ERROR - ERROR - ERROR------"
-    echo "--------------------------------CHECKSUM ERROR!---------------------------------"
+    echo "-----------ERROR - ERROR - ERROR - ERROR - ERROR - ERROR - ERROR - ERROR - ERROR---------------"
+    echo "--------------------------------------CHECKSUM ERROR!------------------------------------------"
+    rm -rf &plugin;
     exit 1
   fi
-  echo "-----------------Sucessfully downloaded usb serial options, please wait...!-----------------"
+  echo "-------------------Sucessfully downloaded usb serial options, please wait...!------------------"
 else
-  echo "-----ERROR - ERROR - ERROR - ERROR - ERROR - ERROR - ERROR - ERROR - ERROR------"
+  echo "-----------ERROR - ERROR - ERROR - ERROR - ERROR - ERROR - ERROR - ERROR - ERROR---------------"
   echo "----------------------------Can't download usb  serial options --------------------------------"
+  rm -rf &plugin;
   exit 1
 fi
 }
 
 check() {
+# Check if packages are already downloaded or download maybe failed
 if [ ! -f "&packages;/${KERNEL_V%%-*}/${PACKAGE}-1.txz" ]; then
   echo "+=============================================================================="
   echo "| WARNING - WARNING - WARNING - WARNING - WARNING - WARNING - WARNING - WARNING"
@@ -93,13 +88,13 @@ if [ ! -f "&packages;/${KERNEL_V%%-*}/${PACKAGE}-1.txz" ]; then
   echo "| WARNING - WARNING - WARNING - WARNING - WARNING - WARNING - WARNING - WARNING"
   echo "+=============================================================================="
   echo "---------------------Downloading usb serial options, please wait...!------------------------"
-  echo "-----------This could take some time, please don't close this window!----------"
+  echo "-----------------This could take some time, please don't close this window!-----------------"
   download
 elif [ ! -s "&packages;/${KERNEL_V%%-*}/${PACKAGE}-1.txz" ]; then
   rm -rf &packages;/${KERNEL_V%%-*}/${PACKAGE}-1.txz
-  echo "-----ERROR - ERROR - ERROR - ERROR - ERROR - ERROR - ERROR - ERROR - ERROR-----"
-  echo "-----Download is empty please contact the developer of this plugin if the------"
-  echo "-------plugin has been already built against the current Kernel version--------"
+  echo "-----------ERROR - ERROR - ERROR - ERROR - ERROR - ERROR - ERROR - ERROR - ERROR---------------"
+  echo "------------Download is empty please contact the developer of this plugin if the---------------"
+  echo "---------------plugin has been already built against the current Kernel version----------------"
   exit 1
 else
   echo
@@ -115,42 +110,35 @@ depmod -a > /dev/null
 
 check_usb_serial_options_repo() {
 #Check if usb serial options is already downloaded
-
-if [ ! -z "$(modinfo options)" ]; then
-    echo "--------------------------usb serial options already installed...!--------------------------"
-else
+if ! modinfo option -0 >/dev/null 2>&amp;1 ; then
     check
     echo "-----------------------Installing usb serial options, please wait...!-----------------------"
     install 
 fi
 }
 
-#Wait for Network and timeout after 30 seconds
-HOST="8.8.8.8"
-for i in {1..10}; do
-  ping -c1 $HOST &amp;> /dev/null &amp;&amp; break;
-done
-
 #Define Variables
-
 KERNEL_V="$(uname -r)"
 PACKAGE="usbserial-plugin-${KERNEL_V}"
 DL_URL="https://github.com/SimonFair/USB_Manager_Serial_Options_addon/releases/download/$KERNEL_V"
 
+# Move old package directory to new package directory to be compliant with 6.11
+if [ -d &plugin;/package ]; then
+  mv &plugin;/package &packages;
+fi
+
 #Check for old packages
 rm -rf $(ls -d &plugin;/package/* | grep -v "${KERNEL_V%%-*}")
 
-# Install the plugin bundle.
-# Create plugin directory
-mkdir /boot/config/plugins/&name; 2>/dev/null
-#mkdir /usr/local/emhttp/plugins/&name; 2>/dev/null
-#mkdir -p /tmp/&name;/config 2>/dev/null
+# Check for old packages
+rm -rf $(ls -d &packages;/* | grep -v "${KERNEL_V%%-*}")
 
+# Create plugin directory
 if [ ! -d "&packages;/${KERNEL_V%%-*}" ]; then
   mkdir -p "&packages;/${KERNEL_V%%-*}"
 fi
 
-# Load Package from ich777 for usb serial options modules and commands.
+# Load Package from Releases tab for usb serial options modules and commands.
 check_usb_serial_options_repo
 
 #Check if Plugin Update Helper is downloaded and up-to-date
@@ -193,12 +181,11 @@ if [ -z "$(ps aux | grep -E "inotifywait -q /boot/changes.txt -e move_self,delet
   echo "/usr/bin/plugin_update_helper" | at now &gt; /dev/null 2&gt;&amp;1
 fi
 
-
 echo 
 echo "-----------------------------------------------------------"
 echo " &name; has been installed."
 echo " "
-echo " Copyright 2016-2020, &author;"
+echo " Copyright 2016-2022, &author;"
 echo " Version: &version;"
 echo ""
 echo "-----------------------------------------------------------"
@@ -213,21 +200,16 @@ The 'remove' script.
 <INLINE>
 
 #Define Variables
-
 KERNEL_V="$(uname -r)"
 PACKAGE="usbserial-plugin-${KERNEL_V}"
-
-# Remove installed packages
-find "&packages;/" -type f -iname "*.txz" -delete
 
 modprobe -rf usb_wwan
 modprobe -rf option
 
-
 # Remove all plugin files from emhttp.
-removepkg "&packages;/&name;/packages/${KERNEL_V%%-*}/${PACKAGE}-1.txz"
-depmod -a > /dev/null
-rm -rf /usr/local/emhttp/plugins/&name;/* 2>/dev/null
+removepkg "&packages;/${KERNEL_V%%-*}/${PACKAGE}-1.txz" >/dev/null 2>&amp;1
+rm -rf &plugin;
+depmod --quick >/dev/null 2>&amp;1
 
 echo 
 echo "-----------------------------------------------------------"
