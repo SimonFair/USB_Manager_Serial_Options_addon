@@ -3,7 +3,7 @@
 <!DOCTYPE PLUGIN [
 <!ENTITY name      "Usb_manager_serial_options_addon">
 <!ENTITY author    "SimonFair">
-<!ENTITY version   "2022.07.17">
+<!ENTITY version   "2022.07.21">
 <!ENTITY pluginURL "https://raw.githubusercontent.com/SimonFair/USB_Manager_Serial_Options_addon/main/usb_manager_serial_options_addon.plg">
 <!ENTITY plugin    "/boot/config/plugins/&name;">
 <!ENTITY supportURL	"https://forums.unraid.net/topic/100511-plugin-usb_managerusbip-commands-and-gui/">
@@ -19,6 +19,10 @@
 		min="6.9.2">
 
 <CHANGES>
+
+###2022.07.21
+- Version detection from package via GitHub API
+- Save md5 in packages directory
 
 ###2022.07.17
 - Necessary changes for unRAID 6.11+
@@ -58,18 +62,19 @@ The 'post-install' script.
 
 download() {
 #Download usb_serial_options
-if wget -q -nc --show-progress --progress=bar:force:noscroll -O "&packages;/${KERNEL_V%%-*}/${PACKAGE}-1.txz" "${DL_URL}/${PACKAGE}-1.txz" ; then
-  if [ "$(md5sum "&packages;/${KERNEL_V%%-*}/${PACKAGE}-1.txz" | cut -d ' ' -f1)" != "$(wget -qO- "${DL_URL}/${PACKAGE}-1.txz.md5" | cut -d ' ' -f1)" ]; then
-    if [ -d &packages;/${KERNEL_V%%-*}/]; then
-      rm -rf &packages;/${KERNEL_V%%-*}/;
-    fi
+if wget -q -nc --show-progress --progress=bar:force:noscroll -O "&packages;/${KERNEL_V%%-*}/${LAT_PACKAGE}" "${DL_URL}/${LAT_PACKAGE}" ; then
+  wget -q -nc --show-progress --progress=bar:force:noscroll -O "&packages;/${KERNEL_V%%-*}/${LAT_PACKAGE}.md5" "${DL_URL}/${LAT_PACKAGE}.md5"
+  if [ "$(md5sum &packages;/${KERNEL_V%%-*}/${LAT_PACKAGE} | awk '{print $1}')" != "$(cat &packages;/${KERNEL_V%%-*}/${LAT_PACKAGE}.md5 | awk '{print $1}')" ]; then
+    echo
     echo "-----------ERROR - ERROR - ERROR - ERROR - ERROR - ERROR - ERROR - ERROR - ERROR---------------"
     echo "--------------------------------------CHECKSUM ERROR!------------------------------------------"
     rm -rf &plugin;
     exit 1
   fi
+  echo
   echo "-------------------Sucessfully downloaded usb serial options, please wait...!------------------"
 else
+  echo
   echo "-----------ERROR - ERROR - ERROR - ERROR - ERROR - ERROR - ERROR - ERROR - ERROR---------------"
   echo "----------------------------Can't download usb  serial options --------------------------------"
   rm -rf &plugin;
@@ -78,24 +83,13 @@ fi
 }
 
 check() {
-# Check if packages are already downloaded or download maybe failed
-if [ ! -f "&packages;/${KERNEL_V%%-*}/${PACKAGE}-1.txz" ]; then
-  echo "+=============================================================================="
-  echo "| WARNING - WARNING - WARNING - WARNING - WARNING - WARNING - WARNING - WARNING"
-  echo "|"
-  echo "| Don't close this window with the red 'X' in the top right corner until the 'DONE' button is displayed!"
-  echo "|"
-  echo "| WARNING - WARNING - WARNING - WARNING - WARNING - WARNING - WARNING - WARNING"
-  echo "+=============================================================================="
+# Check if packages are already downloaded
+if ! ls -1 &packages;/${KERNEL_V%%-*}/ | grep -q "${PACKAGE}" ; then
+  LAT_PACKAGE="$(wget -qO- https://api.github.com/repos/SimonFair/USB_Manager_Serial_Options_addon/releases/tags/${KERNEL_V} | jq -r '.assets[].name' | grep "${PACKAGE}" | grep -E -v '\.md5$' | sort -V | tail -1)"
+  echo
   echo "---------------------Downloading usb serial options, please wait...!------------------------"
   echo "-----------------This could take some time, please don't close this window!-----------------"
   download
-elif [ ! -s "&packages;/${KERNEL_V%%-*}/${PACKAGE}-1.txz" ]; then
-  rm -rf &packages;/${KERNEL_V%%-*}/${PACKAGE}-1.txz
-  echo "-----------ERROR - ERROR - ERROR - ERROR - ERROR - ERROR - ERROR - ERROR - ERROR---------------"
-  echo "------------Download is empty please contact the developer of this plugin if the---------------"
-  echo "---------------plugin has been already built against the current Kernel version----------------"
-  exit 1
 else
   echo
   echo "-----------------------------usb serial options found locally!------------------------------"
@@ -104,22 +98,23 @@ fi
 
 install() {
 #Install usb serial options package
-installpkg "&packages;/${KERNEL_V%%-*}/${PACKAGE}-1.txz"
+installpkg "&packages;/${KERNEL_V%%-*}/${PACKAGE}*.txz"
 depmod -a > /dev/null
 }
 
 check_usb_serial_options_repo() {
 #Check if usb serial options is already downloaded
 if ! modinfo option -0 >/dev/null 2>&amp;1 ; then
-    check
-    echo "-----------------------Installing usb serial options, please wait...!-----------------------"
-    install 
+  check
+  echo
+  echo "-----------------------Installing usb serial options, please wait...!-----------------------"
+  install 
 fi
 }
 
 #Define Variables
 KERNEL_V="$(uname -r)"
-PACKAGE="usbserial-plugin-${KERNEL_V}"
+PACKAGE="usbserial"
 DL_URL="https://github.com/SimonFair/USB_Manager_Serial_Options_addon/releases/download/$KERNEL_V"
 
 # Move old package directory to new package directory to be compliant with 6.11
@@ -201,13 +196,13 @@ The 'remove' script.
 
 #Define Variables
 KERNEL_V="$(uname -r)"
-PACKAGE="usbserial-plugin-${KERNEL_V}"
+PACKAGE="usbserial"
 
 modprobe -rf usb_wwan
 modprobe -rf option
 
 # Remove all plugin files from emhttp.
-removepkg "&packages;/${KERNEL_V%%-*}/${PACKAGE}-1.txz" >/dev/null 2>&amp;1
+removepkg "&packages;/${KERNEL_V%%-*}/${PACKAGE}*.txz" >/dev/null 2>&amp;1
 rm -rf &plugin;
 depmod --quick >/dev/null 2>&amp;1
 
